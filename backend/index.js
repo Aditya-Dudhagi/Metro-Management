@@ -1,27 +1,18 @@
 import express from "express"
 import cors from "cors";
 import dotenv from "dotenv"
-import mysql from "mysql2"
+import db from "./db/connection.js";
+// import routes from "./routes/route.js";
 
 dotenv.config();
 
 const app = express()
+// app.use("/api", routes)
 app.use(cors())
 app.use(express.json());
 
-//MySQL CONNECTION
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-})
 
-db.connect(err => {
-    if (err) throw err;
-    console.log("MySQL connected");
-})
 
 app.get("/", (req, res) => res.send("Metro API running..."));
 
