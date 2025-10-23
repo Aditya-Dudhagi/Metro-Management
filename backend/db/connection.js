@@ -90,12 +90,12 @@ async function initializeSampleData(db) {
       console.log("📝 Inserting initial stations data...");
       await db.query(`
         INSERT INTO stations (name) VALUES
-        ('Station 1'),
-        ('Station 2'),
-        ('Station 3'),
-        ('Station 4'),
-        ('Station 5'),
-        ('Station 6')
+        ('Swargate'),
+        ('Mandai'),
+        ('Railway Station'),
+        ('Civil Court'),
+        ('Ramwadi'),
+        ('Vanaz')
       `);
       console.log("✅ Stations data inserted");
     }
