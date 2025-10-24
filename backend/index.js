@@ -7,9 +7,10 @@ import routes from "./routes/route.js";
 dotenv.config();
 
 const app = express();
-app.use("/api", routes);
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+
+app.use("/api", routes);
 
 app.get("/", (req, res) => res.send("Metro API running..."));
 

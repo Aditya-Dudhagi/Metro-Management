@@ -1,9 +1,10 @@
 import React from 'react'
 
-function Button() {
+function Button({onClick}) {
     return (
         <>
             <button
+                onClick={onClick}
                 className='bg-green-500 text-white p-2 m-2 rounded-lg w-60 hover:bg-green-700'
             >Book Now
             </button>

@@ -2,8 +2,9 @@ import db from "../db/connection.js";
 
 // 🎟 Book a ticket
 export const bookTicket = async (req, res) => {
+  console.log("Request body:", req.body);
   const { userId, sourceId, destinationId } = req.body;
-
+  console.log(userId, sourceId, destinationId);
   try {
     // 1️⃣ Get the fare between source & destination
     const [fareRows] = await db.query(
@@ -16,19 +17,26 @@ export const bookTicket = async (req, res) => {
     }
 
     const fare = fareRows[0].price;
+    console.log("1st is done");
 
     // 2️⃣ Insert new transaction
     const [result] = await db.query(
-      "INSERT INTO transactions (user_id, source_id, destination_id, fare) VALUES (?, ?, ?, ?)",
+      `INSERT INTO transactions (user_id, source_id, destination_id, fare) VALUES (?, ?, ?, ?)`,
       [userId, sourceId, destinationId, fare]
     );
+    console.log(result);
+    
+    console.log("2. is done");
+    
 
     // 3️⃣ Respond success
     res.status(201).json({
       message: "Ticket booked successfully",
       ticketId: result.insertId,
       fare,
+      
     });
+    console.log("3. is done");
   } catch (error) {
     console.error("❌ Error booking ticket:", error);
     res.status(500).json({ message: "Internal server error" });

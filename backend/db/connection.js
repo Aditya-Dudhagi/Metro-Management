@@ -3,29 +3,37 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const db = async () => {
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// create database
+await pool.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
+
+// Now switch to using the database
+await pool.query(`USE \`${process.env.DB_NAME}\`;`);
+async function initializeDatabase() {
   try {
-    const db = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-    });
+    console.log("✅ Connected to MySQL server pool");
 
-    console.log("✅ Connected to MySQL server");
+    await pool.query(
+      `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`
+    );
+    await pool.query(`USE \`${process.env.DB_NAME}\`;`);
 
-    // Create DB if not exists
-    await db.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await db.query(`USE \`${process.env.DB_NAME}\`;`);
-
-    // Create tables
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS stations (
         station_id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(50) NOT NULL
       );
     `);
 
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS fares (
         fare_id INT AUTO_INCREMENT PRIMARY KEY,
         source_id INT,
@@ -36,7 +44,7 @@ const db = async () => {
       );
     `);
 
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         user_id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(50),
@@ -45,7 +53,7 @@ const db = async () => {
       );
     `);
 
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS transactions (
         txn_id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT,
@@ -61,34 +69,22 @@ const db = async () => {
 
     console.log("✅ Tables ready");
 
-    // Initialize with sample data if tables are empty
-    await initializeSampleData(db);
-
-    return db;
+    await initializeSampleData();
   } catch (err) {
     console.error("❌ MySQL connection error:", err);
   }
-};
+}
 
-export default db;
-
-// Function to initialize sample data only if tables are empty
-async function initializeSampleData(db) {
+async function initializeSampleData() {
   try {
-    // Check if stations table has data
-    const [stationRows] = await db.query(
+    const [stationRows] = await pool.query(
       "SELECT COUNT(*) as count FROM stations"
     );
-    const stationCount = stationRows[0].count;
+    const [fareRows] = await pool.query("SELECT COUNT(*) as count FROM fares");
 
-    // Check if fares table has data
-    const [fareRows] = await db.query("SELECT COUNT(*) as count FROM fares");
-    const fareCount = fareRows[0].count;
-
-    // Only insert if tables are empty
-    if (stationCount === 0) {
+    if (stationRows[0].count === 0) {
       console.log("📝 Inserting initial stations data...");
-      await db.query(`
+      await pool.query(`
         INSERT INTO stations (name) VALUES
         ('Swargate'),
         ('Mandai'),
@@ -100,9 +96,9 @@ async function initializeSampleData(db) {
       console.log("✅ Stations data inserted");
     }
 
-    if (fareCount === 0) {
+    if (fareRows[0].count === 0) {
       console.log("📝 Inserting initial fares data...");
-      await db.query(`
+      await pool.query(`
         INSERT INTO fares (source_id, destination_id, price)
         VALUES
         (1, 2, 10.00),
@@ -124,10 +120,28 @@ async function initializeSampleData(db) {
       console.log("✅ Fares data inserted");
     }
 
-    if (stationCount > 0 && fareCount > 0) {
-      console.log("ℹ️  Database already has data, skipping initialization");
+    // Add this check for users table
+    const [userRows] = await pool.query("SELECT COUNT(*) as count FROM users");
+    const userCount = userRows[0].count;
+
+    if (userCount === 0) {
+      console.log("📝 Inserting initial users data...");
+      await pool.query(`
+    INSERT INTO users (user_id, name, email, password) VALUES
+    (1, 'John Doe', 'john@example.com', 'password123'),
+    (2, 'Jane Smith', 'jane@example.com', 'password123'),
+    (3, 'Mike Johnson', 'mike@example.com', 'password123'),
+    (4, 'Sarah Wilson', 'sarah@example.com', 'password123')
+  `);
+      console.log("✅ Users data inserted");
     }
+
+    console.log("ℹ️  Database initialized successfully");
   } catch (err) {
     console.error("❌ Error initializing sample data:", err);
   }
 }
+
+await initializeDatabase();
+
+export default pool;
