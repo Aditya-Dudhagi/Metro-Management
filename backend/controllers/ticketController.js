@@ -8,9 +8,9 @@ export const bookTicket = async (req, res) => {
   try {
     // 1️⃣ Get the fare between source & destination
     const [fareRows] = await db.query(
-      "SELECT price FROM fares WHERE source_id = ? AND destination_id = ?",
-      [sourceId, destinationId]
-    );
+    "SELECT price FROM fares WHERE (source_id = ? AND destination_id = ?) OR (source_id = ? AND destination_id = ?)",
+    [sourceId, destinationId, destinationId, sourceId]
+);
 
     if (fareRows.length === 0) {
       return res.status(404).json({ message: "Fare not found for this route" });
