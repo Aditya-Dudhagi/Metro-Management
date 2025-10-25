@@ -43,39 +43,59 @@ function Card() {
   };
 
   return (
-    <>
-      <div
-        id="card"
-        className="bg-white rounded-lg p-4 m-4 w-[500px] flex flex-col items-center"
-      >
-        <select
-          value={source === null ? "" : source}
-          onChange={(e) => setSource(Number(e.target.value))}
-          className="border p-2 m-2 rounded-lg w-60"
-        >
-          <option value="">Select Source</option>
-          {stations.map((station) => (
-            <option key={station.id} value={station.id}>
-              {station.name}
-            </option>
-          ))}
-        </select>
+    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Book Your Journey</h2>
+      
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            From Station
+          </label>
+          <select
+            value={source === null ? "" : source}
+            onChange={(e) => setSource(Number(e.target.value))}
+            className="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-cyan-500 focus:outline-none transition-colors bg-gray-50"
+          >
+            <option value="">Select Source Station</option>
+            {stations.map((station) => (
+              <option key={station.id} value={station.id}>
+                {station.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          value={destination === null ? "" : destination}
-          onChange={(e) => setDestination(Number(e.target.value))}
-          className="border p-2 m-2 rounded-lg w-60"
-        >
-          <option value="">Select Destination</option>
-          {stations.map((station) => (
-            <option key={station.id} value={station.id}>
-              {station.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex justify-center">
+          <div className="bg-cyan-100 rounded-full p-2">
+            <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            To Station
+          </label>
+          <select
+            value={destination === null ? "" : destination}
+            onChange={(e) => setDestination(Number(e.target.value))}
+            className="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-cyan-500 focus:outline-none transition-colors bg-gray-50"
+          >
+            <option value="">Select Destination Station</option>
+            {stations.map((station) => (
+              <option key={station.id} value={station.id}>
+                {station.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="pt-4">
+          <Button onClick={handleBook} />
+        </div>
       </div>
-      <Button onClick={handleBook} />
-    </>
+    </div>
   );
 }
 
