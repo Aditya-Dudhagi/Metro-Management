@@ -5,3 +5,6 @@ workdir = "backend"
 [start]
 cmd = "npm start"
 workdir = "backend"
+
+[env]
+CHECK = "OK"
