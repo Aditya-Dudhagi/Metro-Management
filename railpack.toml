@@ -1,0 +1,7 @@
+[build]
+builder = "nodejs"
+workdir = "backend"
+
+[start]
+cmd = "npm start"
+workdir = "backend"
